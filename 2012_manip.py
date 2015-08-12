@@ -25,11 +25,37 @@ for i in filmframes[2:]:
 	df = df.append(i)
 
 df = df[pd.notnull(df['Film'])]
-print df.tail()
-print films.head()
-'''
-q = """SELECT df.country, df.sex, films.title, films.year, films.director, films.country FROM df LEFT JOIN films on df.Film = films.title"""
-table = pysqldf(q)
-'''
-q = """select voter_country, film_country, count(sex) from (SELECT df.country as voter_country, df.sex, films.title, films.year, films.director, films.country as film_country FROM df LEFT JOIN films on df.Film = films.title) where voter_country not like '%US%' and film_country LIKE "%USA%" group by voter_country, film_country order by count(sex) DESC"""
-print pysqldf(q)
+
+q = """SELECT df.country as voter_country, df.sex, films.title, films.year, films.director, films.country as film_country FROM df LEFT JOIN films on df.Film = films.title"""
+table = pysqldf(q).copy()
+print table.head()
+
+
+q = """SELECT distinct country FROM df"""
+voter_country_list = pysqldf(q)
+print voter_country_list
+voter_country_list = voter_country_list["Country"].tolist()#["voter_country"].tolist()
+editted_list = set([])
+for country in voter_country_list:
+	listy = []
+	if country:
+		listy = [x.strip() for x in country.split(",")]
+	editted_list.update(listy)
+
+voter_countries = list(editted_list)
+voter_countries.sort()
+print voter_countries
+
+q = """SELECT distinct country from films"""
+film_country_list = pysqldf(q)["Country"].tolist()#["film_country"].tolist()
+editted_list = set([])
+for country in film_country_list:
+	listy = []
+	if country:
+		listy = [x.strip() for x in country.split(",")]
+	editted_list.update(listy)
+
+film_countries = list(editted_list)
+film_countries.sort()
+print film_countries
+
