@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 from pandasql import sqldf
+import csv
 
 pysqldf = lambda q: sqldf(q, globals())
 
@@ -33,7 +34,6 @@ print table.head()
 
 q = """SELECT distinct country FROM df"""
 voter_country_list = pysqldf(q)
-print voter_country_list
 voter_country_list = voter_country_list["Country"].tolist()#["voter_country"].tolist()
 editted_list = set([])
 for country in voter_country_list:
@@ -44,7 +44,7 @@ for country in voter_country_list:
 
 voter_countries = list(editted_list)
 voter_countries.sort()
-print voter_countries
+print len(voter_countries)
 
 q = """SELECT distinct country from films"""
 film_country_list = pysqldf(q)["Country"].tolist()#["film_country"].tolist()
@@ -57,5 +57,24 @@ for country in film_country_list:
 
 film_countries = list(editted_list)
 film_countries.sort()
-print film_countries
+print len(film_countries)
 
+shared_countries = set(film_countries) & set(voter_countries)
+film_only = set(film_countries) - set(voter_countries)
+voter_only = set(voter_countries) - set(film_countries)
+
+country_dict = {}
+
+for country in shared_countries:
+	country_dict[country] = country
+
+for country in film_only:
+	country_dict[country] = raw_input(country + ":")
+
+for country in voter_only:
+	country_dict[country] = raw_input(country + ":")
+
+with open('dict.csv', 'wb') as f:
+	w = csv.DictWriter(f, country_dict.keys())
+	w.writeheader()
+	w.writerow(country_dict)
