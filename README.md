@@ -1,1 +1,2 @@
-# sight-and-sound
+# Sight and Sound
+The most prestigious film poll
